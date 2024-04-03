@@ -75,7 +75,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20230905202853-d090da108d2f
 	k8s.io/kubectl v0.0.0-00010101000000-000000000000
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
-	kubevirt.io/api v0.0.0-00010101000000-000000000000
+	kubevirt.io/api v0.0.0-20240305214914-ae817ad5212e
 	kubevirt.io/client-go v0.0.0-00010101000000-000000000000
 	kubevirt.io/containerized-data-importer-api v1.57.0-alpha1
 	kubevirt.io/controller-lifecycle-operator-sdk/api v0.0.0-20220329064328-f3cc58c6ed90
@@ -202,7 +202,8 @@ replace (
 	k8s.io/sample-controller => k8s.io/sample-controller v0.26.4
 
 	kubevirt.io/api => ./staging/src/kubevirt.io/api
-	kubevirt.io/client-go => ./staging/src/kubevirt.io/client-go
+	// kubevirt.io/client-go => ./staging/src/kubevirt.io/client-go
+	kubevirt.io/client-go => github.com/fntlnz/kubevirt-client-go v0.0.0-20240403012046-9502039d4ec5
 
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.6.2
 )
