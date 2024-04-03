@@ -19,10 +19,11 @@ func (o *SCP) nativeSCP(local templates.LocalSCPArgument, remote templates.Remot
 		ClientConfig: o.clientConfig,
 		Options:      o.options,
 	}
-	client, err := sshClient.PrepareSSHClient(remote.Kind, remote.Namespace, remote.Name)
+	client, streamer, err := sshClient.PrepareSSHClient(remote.Kind, remote.Namespace, remote.Name)
 	if err != nil {
 		return err
 	}
+	defer streamer.Done()
 
 	scpClient, err := scp.NewClientFromExistingSSH(client, &scp.ClientOption{})
 	if err != nil {

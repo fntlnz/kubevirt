@@ -48,17 +48,18 @@ func (o *SSH) nativeSSH(kind, namespace, name string) error {
 		ClientConfig: o.clientConfig,
 		Options:      o.options,
 	}
-	client, err := conn.PrepareSSHClient(kind, namespace, name)
+	client, streamer, err := conn.PrepareSSHClient(kind, namespace, name)
 	if err != nil {
 		return err
 	}
+	defer streamer.Done()
 	return conn.StartSession(client, o.command)
 }
 
-func (o *NativeSSHConnection) PrepareSSHClient(kind, namespace, name string) (*ssh.Client, error) {
+func (o *NativeSSHConnection) PrepareSSHClient(kind, namespace, name string) (*ssh.Client, kubecli.StreamInterface, error) {
 	streamer, err := o.prepareSSHTunnel(kind, namespace, name)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	conn := streamer.AsConn()
@@ -69,7 +70,7 @@ func (o *NativeSSHConnection) PrepareSSHClient(kind, namespace, name string) (*s
 	if len(o.Options.KnownHostsFilePath) > 0 {
 		hostKeyCallback, err = InteractiveHostKeyCallback(o.Options.KnownHostsFilePath)
 		if err != nil {
-			return nil, err
+			return nil, streamer, err
 		}
 	} else {
 		fmt.Println("WARNING: skipping hostkey check, provide --known-hosts to fix this")
@@ -84,10 +85,10 @@ func (o *NativeSSHConnection) PrepareSSHClient(kind, namespace, name string) (*s
 		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, streamer, err
 	}
 
-	return ssh.NewClient(sshConn, chans, reqs), nil
+	return ssh.NewClient(sshConn, chans, reqs), streamer, nil
 }
 
 func (o *NativeSSHConnection) getAuthMethods(kind, namespace, name string) []ssh.AuthMethod {
